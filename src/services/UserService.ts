@@ -23,6 +23,18 @@ class UserService {
 
         return user;
     }
+
+    public async findByEmail(email: string) {
+        const userRepository = getCustomRepository(UserRepository);
+
+        const user = await userRepository.findOne({
+            where: {
+                email
+            }
+        });
+      
+        return user;
+      }
 }
 
 export default new UserService();

@@ -1,3 +1,4 @@
+import Setting from '../entities/Setting';
 import { getCustomRepository } from 'typeorm'
 
 import SettingRepository from '../repositories/SettingRepository';
@@ -27,6 +28,30 @@ class SettingService {
 
         return setting;
     }
+
+    public async findByUsername(username: string) {
+        const settingRepository = getCustomRepository(SettingRepository);
+
+        const settings = await settingRepository.find({
+            username
+        });
+
+        return settings;
+    }
+
+    public async update (username: string, chat: boolean) {
+        const settingRepository = getCustomRepository(SettingRepository);
+        console.log(username, chat)
+        await settingRepository
+            .createQueryBuilder()
+            .update(Setting)
+            .set({ chat })
+            .where('username = :username', {
+                username
+            })
+            .execute();
+    }
+
 }
 
 export default new SettingService();
