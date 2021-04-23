@@ -17,7 +17,7 @@ io.on('connect', (socket: Socket) => {
         let user_id = null;
 
         const userExists = await UserService.findByEmail(email);
-
+        
         if(!userExists) {
             const user = await UserService.create({ email });
 
@@ -37,7 +37,7 @@ io.on('connect', (socket: Socket) => {
 
             } else {
                 connection.socket_id = socket_id;
-                console.log('chegou aqui')    
+       
                 await ConnectionService.create(connection);
             }
             user_id = userExists.id;
@@ -47,5 +47,31 @@ io.on('connect', (socket: Socket) => {
             text,
             user_id
         });
+
+        const allMessages = await MessageService.listByUser(user_id);
+
+        socket.emit('client_list_all_messages', allMessages);
+
+        const allUsers = await ConnectionService.findWithoutAdmin();
+
+        io.emit('admin_list_all_users', allUsers);
+    });
+
+    socket.on('client_send_to_admin', async params => {
+        const { text, socket_admin_id } = params;
+ 
+        const socket_id = socket.id;
+
+        const { user_id } = await ConnectionService.findByUserSocketId(socket_id);
+
+        const message = await MessageService.create({
+            text,
+            user_id
+        });
+
+        io.to(socket_admin_id).emit('admin_receive_message', {
+            message,
+            socket_id
+        })
     });
 });

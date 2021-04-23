@@ -41,7 +41,7 @@ class SettingService {
 
     public async update (username: string, chat: boolean) {
         const settingRepository = getCustomRepository(SettingRepository);
-        console.log(username, chat)
+
         await settingRepository
             .createQueryBuilder()
             .update(Setting)
